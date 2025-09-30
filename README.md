@@ -1,5 +1,11 @@
-# Lecture 18 - RESTful API (Part 3)
+# Leb 18 - RESTful API (Part 3)
+### ป้อนข้อมูลนักศึกษา
 
+รหัส นศ.: 670610688
+
+ชื่อ-สกุล : นางสาวณัฏฐ์ชญา ด้วงผาง
+
+---
 ### Content
 
 - Current API
