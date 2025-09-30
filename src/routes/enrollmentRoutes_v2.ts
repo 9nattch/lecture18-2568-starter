@@ -147,7 +147,7 @@ router.get("/:studentId",authenticateToken,(req: CustomRequest, res: Response) =
         .filter((course) => course.studentId === studentId)
         .map((course) => course.courseId);
 
-      res.set("Link", `/enrollment/${studentId}`);
+      // res.set("Link", `/enrollment/${studentId}`);
       res.status(200).json({
         success: true,
         message: "Student Information",
@@ -223,7 +223,7 @@ router.post("/:studentId",authenticateToken,checkAllRoles,(req: CustomRequest, r
 
       enrollments.push(newEnrollment);//เพิ่มข้อมูลเข้าไป
       
-      res.set("Link", `/enrollment/${studentId}`);
+      // res.set("Link", `/enrollment/${studentId}`);
       return res.status(201).json({
         success: true,
         message: `Student ${studentId} && Course ${body.courseId} has been added successfully`,
@@ -292,7 +292,7 @@ router.delete("/:studentId",authenticateToken,(req: CustomRequest, res: Response
       courseId: enrollment.courseId,
     }));
 
-    res.set("Link", `/enrollment/${studentId}`);
+    // res.set("Link", `/enrollment/${studentId}`);
       return res.status(200).json({
         success: true,
         message: `Student ${studentId} && Course ${courseIdStr} has been deleted successfully`,
