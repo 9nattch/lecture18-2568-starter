@@ -5,7 +5,6 @@ import {
   users,
   reset_users,
   students,
-  courses,
 } from "../db/db.js";
 import { authenticateToken } from "../middlewares/authenMiddleware.js";
 import { checkRoleAdmin } from "../middlewares/checkRoleAdminMiddleware.js";
@@ -13,6 +12,7 @@ import type { CustomRequest } from "../libs/types.js";
 import { zStudentId, zCourseId } from "../libs/zodValidators.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { checkAllRoles } from "../middlewares/checkAllRoleMiddleware.js";
 dotenv.config();
 
 const router = Router();
@@ -48,7 +48,7 @@ router.get("/",authenticateToken,checkRoleAdmin,(req: CustomRequest, res: Respon
 );
 
 // POST /api/v2/users/login
-router.post("/login", (req: Request, res: Response) => {
+router.post("/login",authenticateToken, (req: Request, res: Response) => {
   try {
     //1. get username and password from body
     const { username, password } = req.body;
@@ -97,7 +97,7 @@ router.post("/login", (req: Request, res: Response) => {
 });
 
 // POST /api/v2/enrollments/reset
-router.post("/reset", (req: Request, res: Response) => {
+router.post("/reset", authenticateToken, (req: Request, res: Response) => {
   try {
     reset_users();
     return res.status(200).json({
@@ -125,9 +125,7 @@ router.get("/:studentId",authenticateToken,(req: CustomRequest, res: Response) =
         });
       }
 
-      const isAuthorized =
-        req.user?.role === "ADMIN" ||
-        (req.user?.role === "STUDENT" && req.user.studentId === studentId);
+      const isAuthorized = req.user?.role === "ADMIN" || (req.user?.role === "STUDENT" && req.user.studentId === studentId);
       if (!isAuthorized) {
         return res.status(403).json({
           success: false,
@@ -154,11 +152,8 @@ router.get("/:studentId",authenticateToken,(req: CustomRequest, res: Response) =
         success: true,
         message: "Student Information",
         data: {
-          studentId: studentId,
-          firstName: student.firstName,
-          lastName: student.lastName,
-          program: student.program,
-          courses: studentEnrollments,
+          ...student,
+          courses : studentEnrollments,
         },
       });
     } catch (err) {
@@ -172,7 +167,7 @@ router.get("/:studentId",authenticateToken,(req: CustomRequest, res: Response) =
 );
 
 // POST/api/v2/enrollments/:studentId
-router.post("/:studentId",authenticateToken,(req: CustomRequest, res: Response) => {
+router.post("/:studentId",authenticateToken,checkAllRoles,(req: CustomRequest, res: Response) => {
     try {
       const studentId = req.params.studentId;
       const body = req.body as { courseId: string };
@@ -185,19 +180,19 @@ router.post("/:studentId",authenticateToken,(req: CustomRequest, res: Response) 
         });
       }
 
-      if (req.user?.role === "ADMIN") {
-        return res.status(403).json({
-          success: false,
-          message: "Forbidden access",
-        });
-      }
+      // if (req.user?.role === "ADMIN") {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message: "Forbidden access",
+      //   });
+      // }
 
-      if (req.user?.role === "STUDENT" && req.user.studentId !== studentId) {
-        return res.status(403).json({
-          success: false,
-          message: "Forbidden access",
-        });
-      }
+      // if (req.user?.role === "STUDENT" && req.user.studentId !== studentId) {
+      //   return res.status(403).json({
+      //     success: false,
+      //     message: "Forbidden access",
+      //   });
+      // }
 
       const student = students.find(
         (student) => student.studentId === studentId
@@ -245,10 +240,7 @@ router.post("/:studentId",authenticateToken,(req: CustomRequest, res: Response) 
 );
 
 // DELETE/api/v2/enrollments/:studentId
-router.delete(
-  "/:studentId",
-  authenticateToken,
-  (req: CustomRequest, res: Response) => {
+router.delete("/:studentId",authenticateToken,(req: CustomRequest, res: Response) => {
     try {
       const studentId = req.params.studentId;
       const { courseId } = req.body;

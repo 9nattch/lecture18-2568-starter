@@ -8,7 +8,7 @@ import { users, reset_users } from "../db/db.js";
 //   token?: string; // Define the token property
 // }
 
-export const checkRoles = (
+export const checkRoleStudent = (
   req: CustomRequest,
   res: Response,
   next: NextFunction
@@ -19,7 +19,7 @@ export const checkRoles = (
 
   // 2. check if user exists (search with username)
   const user = users.find((u: User) => u.username === payload?.username);
-  if (!user) {
+  if (!user || user.role !== "STUDENT") {
     return res.status(401).json({
       success: false,
       message: "Unauthorized user",

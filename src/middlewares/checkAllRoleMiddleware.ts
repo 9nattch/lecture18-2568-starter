@@ -8,7 +8,7 @@ import { users, reset_users } from "../db/db.js";
 //   token?: string; // Define the token property
 // }
 
-export const checkRoles = (
+export const checkAllRoles = (
   req: CustomRequest,
   res: Response,
   next: NextFunction
@@ -25,6 +25,23 @@ export const checkRoles = (
       message: "Unauthorized user",
     });
   }
+
+  const studentIdParam = req.params.studentId || req.body.studentId;
+  if (req.user?.role === "ADMIN") {
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden access",
+        });
+      }
+
+      if (req.user?.role === "STUDENT" && req.user.studentId !== studentIdParam) {
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden access",
+        });
+      }
+
+
 
   // (optional) check if token exists in user data
 
