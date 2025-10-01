@@ -26,21 +26,6 @@ export const checkAllRoles = (
     });
   }
 
-  const studentIdParam = req.params.studentId || req.body.studentId;
-  if (req.user?.role === "ADMIN") {
-        return res.status(403).json({
-          success: false,
-          message: "Forbidden access",
-        });
-      }
-
-      if (req.user?.role === "STUDENT" && req.user.studentId !== studentIdParam) {
-        return res.status(403).json({
-          success: false,
-          message: "Forbidden access",
-        });
-      }
-
 
 
   // (optional) check if token exists in user data

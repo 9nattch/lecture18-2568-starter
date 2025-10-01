@@ -167,7 +167,7 @@ router.get("/:studentId",authenticateToken,(req: CustomRequest, res: Response) =
 );
 
 // POST/api/v2/enrollments/:studentId
-router.post("/:studentId",authenticateToken,checkAllRoles,(req: CustomRequest, res: Response) => {
+router.post("/:studentId",authenticateToken,(req: CustomRequest, res: Response) => {
     try {
       const studentId = req.params.studentId;
       const body = req.body as { courseId: string };
@@ -180,19 +180,19 @@ router.post("/:studentId",authenticateToken,checkAllRoles,(req: CustomRequest, r
         });
       }
 
-      // if (req.user?.role === "ADMIN") {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: "Forbidden access",
-      //   });
-      // }
+      if (req.user?.role === "ADMIN") {
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden access",
+        });
+      }
 
-      // if (req.user?.role === "STUDENT" && req.user.studentId !== studentId) {
-      //   return res.status(403).json({
-      //     success: false,
-      //     message: "Forbidden access",
-      //   });
-      // }
+      if (req.user?.role === "STUDENT" && req.user.studentId !== studentId) {
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden access",
+        });
+      }
 
       const student = students.find(
         (student) => student.studentId === studentId
